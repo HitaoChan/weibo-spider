@@ -62,6 +62,7 @@ def getTopic(id):
     print(str.group(0))
     # print(card.get('longTextContent'))
 
+
 if __name__ == "__main__":
     url = "https://m.weibo.cn/comments/hotflow?id=4610404497493299&mid=4610404497493299&max_id_type=0"
     CatchData(url) #评论爬取 通过，楼中楼爬取未通过
