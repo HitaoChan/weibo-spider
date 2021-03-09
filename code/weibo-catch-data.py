@@ -63,6 +63,68 @@ def getTopic(id):
     # print(card.get('longTextContent'))
 
 
+def start_crawl(cookie_dict,id):
+	base_url = 'https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id_type=0'
+	next_url = 'https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id={}&max_id_type={}'
+	page = 1
+	id_type = 0
+	comment_count = 0
+	requests_count = 1
+	res = requests.get(url=base_url.format(id,id), headers=headers,cookies=cookie_dict)
+	while True:
+		print('parse page {}'.format(page))
+		page += 1
+		try:
+			data = res.json()['data']
+			wdata = []
+			max_id = data['max_id']
+			for c in data['data']:
+				comment_count += 1
+				row = info_parser(c)
+				wdata.append(info_parser(c))
+				if c.get('comments', None):
+					temp = []
+					for cc in c.get('comments'):
+						temp.append(info_parser(cc))
+						wdata.append(info_parser(cc))
+						comment_count += 1
+					row['comments'] = temp
+				print(row)
+			with open('{}/{}.csv'.format(comment_path, id), mode='a+', encoding='utf-8-sig', newline='') as f:
+				writer = csv.writer(f)
+				for d in wdata:
+					writer.writerow([d['wid'],d['time'],d['text'],d['uid'],d['username'],d['following'],d['followed'],d['gender']])
+
+			time.sleep(5)
+		except:
+			print(res.text)
+			id_type += 1
+			print('评论总数: {}'.format(comment_count))
+
+		res = requests.get(url=next_url.format(id, id, max_id,id_type), headers=headers,cookies=cookie_dict)
+		requests_count += 1
+		if requests_count%50==0:
+			print(id_type)
+		print(res.status_code)
+
+
+def info_parser(data):
+	id,time,text =  data['id'],data['created_at'],data['text']
+	user = data['user']
+	uid,username,following,followed,gender = \
+		user['id'],user['screen_name'],user['follow_count'],user['followers_count'],user['gender']
+	return {
+		'wid':id,
+		'time':time,
+		'text':text,
+		'uid':uid,
+		'username':username,
+		'following':following,
+		'followed':followed,
+		'gender':gender
+	}
+
+
 if __name__ == "__main__":
     url = "https://m.weibo.cn/comments/hotflow?id=4610404497493299&mid=4610404497493299&max_id_type=0"
     CatchData(url) #评论爬取 通过，楼中楼爬取未通过
