@@ -49,8 +49,8 @@ def get_urls(schemes):
         # response=requests.get(url,headers=header,cookies=Cookie)
         # json = response.json()
         # jsons.append(response.json())
-
     return urls
+
 class GetKeyValue(object):
     """
     从json中找到key的值
@@ -104,14 +104,15 @@ count = 0
 target = 1000
 #评论爬取模块
 # 接受json 提取键值内容
-def CatchData(id,max_id):
+def CatchData(id,max_id=0):
     global count
     global target
     # 得到评论区 爬取第一页
     try:
         time.sleep(0.25)
-        url="https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id_type=0".format(str(id),str(id))
-        response = requests.get(url, timeout=30)
+        url="https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id_type=0&max_id={}".format(str(id),str(id),str(max_id))
+        print(url)
+        response = requests.get(url,headers=header,cookies=Cookie)
         # 如果不是200，引发HTTPEroor异常
         response.raise_for_status()
         response.encoding = response.apparent_encoding
@@ -119,6 +120,7 @@ def CatchData(id,max_id):
         print("产生异常")
     data = response.json()
     cards = data['data']['data']
+    max_id_from_data = data['data']['max_id']
     for card in cards:
         # 加上一个楼中楼爬取
         # pprint.pprint(card) card是每一条回复
@@ -126,7 +128,8 @@ def CatchData(id,max_id):
             text = card.get('text')  # 评论
             like_count = card.get('like_count')  # 点赞
             user = card.get('user')  # 评论用户表信息
-            max_id = card.get('max_id') #下一页的id
+            max_id = max_id_from_data #下一页的id
+
             name = user.get('screen_name')  # 用户名
             profile = user.get('profile_url')  # 用户主页
             fileName=titles[index]
@@ -183,14 +186,7 @@ def get_index(titles):
     index = input("input the index:")
     return int(index)
 
-class Weibo:
-    def __init__(self):
-        self.topics = get_topics()
-        self.titles, self.schemes = get_titles_schemes(self.topics)
-        self.urls = get_urls(self.schemes)
-        self.ids = get_ids(self.urls)
-        self.index = get_index(self.titles)
-        self.title = self.titles[self.index]
+
 
 if __name__ == "__main__":
     # 准备工作 topics是帮当的json，titles是榜单事件标题，schemes是各榜单转换url的原材料，urls是各事件的url，ids是爬取评论的id关键词

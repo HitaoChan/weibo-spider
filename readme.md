@@ -4,4 +4,10 @@ url="https://m.weibo.cn/comments/hotflow?id=4282494510984677&mid=428249451098467
 
 其中关键的属性是id、mid、max_id、max_id_type
 
-max_id是上一个请求返回的分页参数，max_id_type默认设置为0，
+max_id是上一个请求返回的分页参数，max_id_type默认设置为0
+
+# 训练模型
+
+
+
+C:\Users\ChenTT\AppData\Local\Programs\Python\Python37\Lib\site-packages\snownlp\sentiment

@@ -16,7 +16,7 @@ def generate_HTML_sentiment(title):
         return sentiments
 
     def get_PNG(sentiments):
-        print(sentiments)
+        #print(sentiments)
         plt.hist(sentiments, bins=np.arange(0, 1, 0.01), facecolor='g')
         plt.xlabel('Sentiments Probability')
         plt.ylabel('Quantity')
